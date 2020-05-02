@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="Makefile" />
+    <None Include="cpp.nx.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\main.c" />
+    <ClCompile Include="source\USB\usbDsExten.c">
+      <Filter>USB</Filter>
+    </ClCompile>
+    <ClCompile Include="source\USB\VideoDev.c">
+      <Filter>USB</Filter>
+    </ClCompile>
+    <ClCompile Include="source\USB\UsbComms.c">
+      <Filter>USB</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="USB">
+      <UniqueIdentifier>{9bfa2c4b-366b-4314-ad96-1857fc652136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modes">
+      <UniqueIdentifier>{a9b9917f-cd34-41ec-9b74-306563ce2eca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\USB\UsbComms.h">
+      <Filter>USB</Filter>
+    </ClInclude>
+    <ClInclude Include="source\USB\usbDsExten.h">
+      <Filter>USB</Filter>
+    </ClInclude>
+    <ClInclude Include="source\USB\uvc.h">
+      <Filter>USB</Filter>
+    </ClInclude>
+    <ClInclude Include="source\USB\VideoDev.h">
+      <Filter>USB</Filter>
+    </ClInclude>
+    <ClInclude Include="source\modes\modes.h">
+      <Filter>modes</Filter>
+    </ClInclude>
+    <ClInclude Include="source\modes\defines.h">
+      <Filter>modes</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
