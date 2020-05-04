@@ -415,10 +415,10 @@ struct uvc_format_h264 {
 	__u16 wMaxMBperSecTwoResTemporalSpatialScalability;
 	__u16 wMaxMBperSecThreeResTemporalSpatialScalability;
 	__u16 wMaxMBperSecFourResTemporalSpatialScalability;
-	//__u16 wMaxMBperSecOneResFullScalability;
-	//__u16 wMaxMBperSecTwoResFullScalability;
-	//__u16 wMaxMBperSecThreeResFullScalability;
-	//__u16 wMaxMBperSecFourResFullScalability;
+	__u16 wMaxMBperSecOneResFullScalability;
+	__u16 wMaxMBperSecTwoResFullScalability;
+	__u16 wMaxMBperSecThreeResFullScalability;
+	__u16 wMaxMBperSecFourResFullScalability;
 } __attribute__((__packed__));
 
 

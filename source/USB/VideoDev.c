@@ -12,6 +12,7 @@ static UsbDsInterface *UsbDsVideo, *UsbDsCtrl;
 
 #define CONTROL_INTERFACE 		0
 #define STREAM_INTERFACE		1
+#define WORKAROUND_INTERFACE	2
 
 #define INTERFACE_CTRL_ID		0
 #define INPUT_TERMINAL_ID		1
@@ -45,6 +46,10 @@ static VideoStreamingInterfaceDescriptor VSIfaceDescriptor;
 static struct usb_interface_descriptor ControlInterface;
 static struct usb_interface_descriptor StreamingInterface;
 
+//This is needed because there seems to be a limit on the descriptor length for a single interface and the streaming one doesn't cut it by 8 bytes.
+//So this will append the VS descriptor before its own so hosts will interpet it as being part of the previous interface
+static struct usb_interface_descriptor WorkaroundInterface;
+
 static struct usb_endpoint_descriptor StreamingEndpoint;
 
 static const struct uvc_streaming_control ControlSettings =
@@ -75,6 +80,7 @@ static void ClearState()
 	clearVal(StreamingEndpoint);
 	clearVal(VCIfaceDescriptor);
 	clearVal(VSIfaceDescriptor);
+	clearVal(WorkaroundInterface);
 #undef clearVal
 	if (eventActive(&VideoSetupEvent))
 		eventClose(&VideoSetupEvent);
@@ -239,6 +245,16 @@ Result UsbVideoInitialize(UsbInterface* VideoStream)
 		.bInterval = 0
 	};
 
+	WorkaroundInterface = (struct usb_interface_descriptor){
+		.bLength = USB_DT_INTERFACE_SIZE,
+		.bDescriptorType = USB_DT_INTERFACE,
+		.bInterfaceNumber = WORKAROUND_INTERFACE,
+		.bNumEndpoints = 0,
+		.bInterfaceClass = USB_CLASS_VENDOR_SPEC,
+		.bInterfaceSubClass = 0,
+		.bInterfaceProtocol = 0,
+	};
+
 	//ControlStream->interface = CONTROL_INTERFACE;
 	//ControlStream->ReadEP = 0;
 	//Control requests are being handled in this file
@@ -246,7 +262,7 @@ Result UsbVideoInitialize(UsbInterface* VideoStream)
 	VideoStream->interface = STREAM_INTERFACE;
 	VideoStream->WriteEP = 0;
 
-	UsbInterfaceDesc interfaces[2] = {0};
+	UsbInterfaceDesc interfaces[3] = {0};
 
 	interfaces[CONTROL_INTERFACE].interface_desc = &ControlInterface;
 	interfaces[CONTROL_INTERFACE].string_descriptor = "Control";
@@ -258,10 +274,12 @@ Result UsbVideoInitialize(UsbInterface* VideoStream)
 	interfaces[STREAM_INTERFACE].interface_desc = &StreamingInterface;
 	interfaces[STREAM_INTERFACE].endpoint_desc[0] = &StreamingEndpoint;
 	interfaces[STREAM_INTERFACE].string_descriptor = "Stream";
-	interfaces[STREAM_INTERFACE].ExtraDescriptors.Addr = &VSIfaceDescriptor;
-	interfaces[STREAM_INTERFACE].ExtraDescriptors.Len = sizeof(VSIfaceDescriptor);
 
-	Result rc = UsbCommsInitialize(&device_descriptor, 2, interfaces);
+	interfaces[WORKAROUND_INTERFACE].interface_desc = &WorkaroundInterface;
+	interfaces[WORKAROUND_INTERFACE].ConfigDescriptors.Addr = &VSIfaceDescriptor;
+	interfaces[WORKAROUND_INTERFACE].ConfigDescriptors.Len = sizeof(VSIfaceDescriptor);
+
+	Result rc = UsbCommsInitialize(&device_descriptor, 3, interfaces);
 	if (R_FAILED(rc))
 	{
 		LOG("UsbCommsInitialize %x", rc);

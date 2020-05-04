@@ -124,7 +124,7 @@ Result UsbCommsInitialize(struct usb_device_descriptor* device_descriptor, u32 n
 
 					usbCommsInterface* intf = &g_usbCommsInterfaces[i];
 					const UsbInterfaceDesc* info = &infos[i];
-					intf->endpoint_number = info->interface_desc->bNumEndpoints;
+					intf->endpoint_number = info->interface_desc ? info->interface_desc->bNumEndpoints : 0;
 					rwlockWriteLock(&intf->lock);
 					for (u32 i = 0; i < intf->endpoint_number; i++)
 					{
@@ -220,13 +220,16 @@ static Result _usbCommsInterfaceInit5x(u32 intf_ind, const UsbInterfaceDesc* inf
 	Result rc = 0;
 	usbCommsInterface* interface = &g_usbCommsInterfaces[intf_ind];
 
-	u8 index = 0;
-	if (info->string_descriptor != NULL)
+	if (info->interface_desc)
 	{
-		usbDsAddUsbStringDescriptor(&index, info->string_descriptor);
-		LOG("-- Using string descriptor: %s -- %d", info->string_descriptor, index);
+		u8 index = 0;
+		if (info->string_descriptor != NULL)
+		{
+			usbDsAddUsbStringDescriptor(&index, info->string_descriptor);
+			LOG("-- Using string descriptor: %s -- %d", info->string_descriptor, index);
+		}
+		info->interface_desc->iInterface = index;
 	}
-	info->interface_desc->iInterface = index;
 
 	struct usb_ss_endpoint_companion_descriptor endpoint_companion = {
 		.bLength = sizeof(struct usb_ss_endpoint_companion_descriptor),
@@ -254,18 +257,20 @@ static Result _usbCommsInterfaceInit5x(u32 intf_ind, const UsbInterfaceDesc* inf
 	rc = usbDsRegisterInterface(&interface->interface);
 	R_FAILED_LOG_RETURN(rc);
 
-	info->interface_desc->bInterfaceNumber = interface->interface->interface_index;
-	for (u32 i = 0; i < interface->endpoint_number; i++)
-	{
-		if ((info->endpoint_desc[i]->bEndpointAddress & USB_ENDPOINT_IN) != 0)
+	if (info->interface_desc) {
+		info->interface_desc->bInterfaceNumber = interface->interface->interface_index;
+		for (u32 i = 0; i < interface->endpoint_number; i++)
 		{
-			info->endpoint_desc[i]->bEndpointAddress |= ep_in;
-			ep_in++;
-		}
-		else
-		{
-			info->endpoint_desc[i]->bEndpointAddress |= ep_out;
-			ep_out++;
+			if ((info->endpoint_desc[i]->bEndpointAddress & USB_ENDPOINT_IN) != 0)
+			{
+				info->endpoint_desc[i]->bEndpointAddress |= ep_in;
+				ep_in++;
+			}
+			else
+			{
+				info->endpoint_desc[i]->bEndpointAddress |= ep_out;
+				ep_out++;
+			}
 		}
 	}
 
@@ -279,67 +284,52 @@ static Result _usbCommsInterfaceInit5x(u32 intf_ind, const UsbInterfaceDesc* inf
 		R_FAILED_LOG_RETURN(rc);
 	}
 
-	// Full Speed Config
-	rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Full, info->interface_desc, USB_DT_INTERFACE_SIZE);
-	R_FAILED_LOG_RETURN(rc);
-
+	if (info->interface_desc)
+	{
+		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Full, info->interface_desc, USB_DT_INTERFACE_SIZE);
+		R_FAILED_LOG_RETURN(rc);
+		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_High, info->interface_desc, USB_DT_INTERFACE_SIZE);
+		if (R_FAILED(rc)) return rc;
+		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, info->interface_desc, USB_DT_INTERFACE_SIZE);
+		R_FAILED_LOG_RETURN(rc);
+	}
+	
 	if (info->ExtraDescriptors.Addr)
 	{
 		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Full, info->ExtraDescriptors.Addr, info->ExtraDescriptors.Len);
 		R_FAILED_LOG_RETURN(rc);
-	}
-
-	for (u32 i = 0; i < interface->endpoint_number; i++)
-	{
-		if (info->endpoint_desc[i]->bmAttributes == USB_TRANSFER_TYPE_BULK)
-			info->endpoint_desc[i]->wMaxPacketSize = 0x40;
-		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Full, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
-		R_FAILED_LOG_RETURN(rc);
-	}
-
-	// High Speed Config
-	rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_High, info->interface_desc, USB_DT_INTERFACE_SIZE);
-	if (R_FAILED(rc)) return rc;
-
-	if (info->ExtraDescriptors.Addr)
-	{
 		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_High, info->ExtraDescriptors.Addr, info->ExtraDescriptors.Len);
 		R_FAILED_LOG_RETURN(rc);
-	}
-
-	for (u32 i = 0; i < interface->endpoint_number; i++)
-	{
-		if (info->endpoint_desc[i]->bmAttributes == USB_TRANSFER_TYPE_BULK)
-			info->endpoint_desc[i]->wMaxPacketSize = 0x200;
-		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_High, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
-		R_FAILED_LOG_RETURN(rc);
-	}
-
-	// Super Speed Config
-	rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, info->interface_desc, USB_DT_INTERFACE_SIZE);
-	R_FAILED_LOG_RETURN(rc);
-
-	if (info->ExtraDescriptors.Addr)
-	{
 		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, info->ExtraDescriptors.Addr, info->ExtraDescriptors.Len);
 		R_FAILED_LOG_RETURN(rc);
 	}
 
-	for (u32 i = 0; i < interface->endpoint_number; i++)
-	{
-		if (info->endpoint_desc[i]->bmAttributes == USB_TRANSFER_TYPE_BULK)
-			info->endpoint_desc[i]->wMaxPacketSize = 0x400;
-		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
-		R_FAILED_LOG_RETURN(rc);
-		rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, &endpoint_companion, USB_DT_SS_ENDPOINT_COMPANION_SIZE);
-		R_FAILED_LOG_RETURN(rc);
-	}
-
 	//Setup endpoints.    
-	for (u32 i = 0; i < interface->endpoint_number; i++)
-	{
-		rc = usbDsInterface_RegisterEndpoint(interface->interface, &interface->endpoint[i].endpoint, info->endpoint_desc[i]->bEndpointAddress);
-		R_FAILED_LOG_RETURN(rc);
+	if (info->interface_desc) {
+		for (u32 i = 0; i < interface->endpoint_number; i++)
+		{
+			bool IsBulk = info->endpoint_desc[i]->bmAttributes == USB_TRANSFER_TYPE_BULK;
+
+			if (IsBulk)
+				info->endpoint_desc[i]->wMaxPacketSize = 0x40;
+			rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Full, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
+			R_FAILED_LOG_RETURN(rc);
+
+			if (IsBulk)
+				info->endpoint_desc[i]->wMaxPacketSize = 0x200;
+			rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_High, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
+			R_FAILED_LOG_RETURN(rc);
+
+			if (IsBulk)
+				info->endpoint_desc[i]->wMaxPacketSize = 0x400;
+			rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, info->endpoint_desc[i], USB_DT_ENDPOINT_SIZE);
+			R_FAILED_LOG_RETURN(rc);
+			rc = usbDsInterface_AppendConfigurationData(interface->interface, UsbDeviceSpeed_Super, &endpoint_companion, USB_DT_SS_ENDPOINT_COMPANION_SIZE);
+			R_FAILED_LOG_RETURN(rc);
+		
+			rc = usbDsInterface_RegisterEndpoint(interface->interface, &interface->endpoint[i].endpoint, info->endpoint_desc[i]->bEndpointAddress);
+			R_FAILED_LOG_RETURN(rc);
+		}
 	}
 
 	rc = usbDsInterface_EnableInterface(interface->interface);
