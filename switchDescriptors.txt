@@ -1,0 +1,347 @@
+[Port6]  :  Dispositivo USB composito
+
+
+Is Port User Connectable:         yes
+Is Port Debug Capable:            no
+Companion Port Number:            18
+Companion Hub Symbolic Link Name: USB#ROOT_HUB30#4&2a76328f&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+Protocols Supported:
+ USB 1.1:                         yes
+ USB 2.0:                         yes
+ USB 3.0:                         no
+
+Device Power State:               PowerDeviceD3
+
+       ---===>Device Information<===---
+String Descriptor for index 2 not available while device is in low power state.
+
+ConnectionStatus:                  
+Current Config Value:              0x01  -> Device Bus Speed: High (is not SuperSpeed or higher capable)
+Device Address:                    0x24
+Open Pipes:                           1
+
+          ===>Device Descriptor<===
+bLength:                           0x12
+bDescriptorType:                   0x01
+bcdUSB:                          0x0200
+bDeviceClass:                      0xEF  -> This is a Multi-interface Function Code Device
+bDeviceSubClass:                   0x02  -> This is the Common Class Sub Class
+bDeviceProtocol:                   0x01  -> This is the Interface Association Descriptor protocol
+bMaxPacketSize0:                   0x40 = (64) Bytes
+idVendor:                        0x057E = Nintendo Co., Ltd.
+idProduct:                       0x3008
+bcdDevice:                       0x0100
+iManufacturer:                     0x01
+String Descriptor for index 1 not available while device is in low power state.
+iProduct:                          0x02
+String Descriptor for index 2 not available while device is in low power state.
+iSerialNumber:                     0x03
+String Descriptor for index 3 not available while device is in low power state.
+bNumConfigurations:                0x01
+
+          ---===>Open Pipes<===---
+
+          ===>Endpoint Descriptor<===
+bLength:                           0x07
+bDescriptorType:                   0x05
+bEndpointAddress:                  0x81  -> Direction: IN - EndpointID: 1
+bmAttributes:                      0x02  -> Bulk Transfer Type
+wMaxPacketSize:                  0x0200 = 0x200 max bytes
+bInterval:                         0x00
+
+       ---===>Full Configuration Descriptor<===---
+
+          ===>Configuration Descriptor<===
+bLength:                           0x09
+bDescriptorType:                   0x02
+wTotalLength:                    0x00C3  -> Validated
+bNumInterfaces:                    0x03
+bConfigurationValue:               0x01
+iConfiguration:                    0x00
+bmAttributes:                      0xC0  -> Self Powered
+MaxPower:                          0xFA = 500 mA
+
+          ===>IAD Descriptor<===
+bLength:                           0x08
+bDescriptorType:                   0x0B
+bFirstInterface:                   0x00
+bInterfaceCount:                   0x02
+bFunctionClass:                    0x0E  -> Video Interface Class
+bFunctionSubClass:                 0x03  -> Video Interface Collection
+bFunctionProtocol:                 0x00  -> PC_PROTOCOL_UNDEFINED protocol
+iFunction:                         0x04
+String Descriptor for index 4 not available while device is in low power state.
+
+          ===>Interface Descriptor<===
+bLength:                           0x09
+bDescriptorType:                   0x04
+bInterfaceNumber:                  0x00
+bAlternateSetting:                 0x00
+bNumEndpoints:                     0x00
+bInterfaceClass:                   0x0E  -> Video Interface Class
+bInterfaceSubClass:                0x01  -> Video Control Interface SubClass
+bInterfaceProtocol:                0x00
+iInterface:                        0x04
+String Descriptor for index 4 not available while device is in low power state.
+
+          ===>Class-Specific Video Control Interface Header Descriptor<===
+bLength:                           0x0D
+bDescriptorType:                   0x24
+bDescriptorSubtype:                0x01
+bcdUVC:                          0x0150
+wTotalLength:                    0x001E  -> Validated
+dwClockFreq:                 0x00015F90 = (90000) Hz
+bInCollection:                     0x01
+baInterfaceNr[1]:                  0x01
+USB Video Class device: spec version 1.5
+
+          ===>Video Control Input Terminal Descriptor<===
+bLength:                           0x08
+bDescriptorType:                   0x24
+bDescriptorSubtype:                0x02
+bTerminalID:                       0x01
+wTerminalType:                   0x0200 = (ITT_VENDOR_SPECIFIC)
+bAssocTerminal:                    0x00
+iTerminal:                         0x00
+
+          ===>Video Control Output Terminal Descriptor<===
+bLength:                           0x09
+bDescriptorType:                   0x24
+bDescriptorSubtype:                0x03
+bTerminalID:                       0x02
+wTerminalType:                   0x0101 = (TT_STREAMING)
+bAssocTerminal:                    0x00
+bSourceID:                         0x01
+iTerminal:                         0x00
+
+          ===>Interface Descriptor<===
+bLength:                           0x09
+bDescriptorType:                   0x04
+bInterfaceNumber:                  0x01
+bAlternateSetting:                 0x00
+bNumEndpoints:                     0x01
+bInterfaceClass:                   0x0E  -> Video Interface Class
+bInterfaceSubClass:                0x02  -> Video Streaming Interface SubClass
+bInterfaceProtocol:                0x00
+iInterface:                        0x05
+String Descriptor for index 5 not available while device is in low power state.
+
+          ===>Endpoint Descriptor<===
+bLength:                           0x07
+bDescriptorType:                   0x05
+bEndpointAddress:                  0x81  -> Direction: IN - EndpointID: 1
+bmAttributes:                      0x02  -> Bulk Transfer Type
+wMaxPacketSize:                  0x0200 = 0x200 max bytes
+bInterval:                         0x00
+
+          ===>Video Class-Specific VS Video Input Header Descriptor<===
+bLength:                           0x0E
+bDescriptorType:                   0x24
+bDescriptorSubtype:                0x01
+bNumFormats:                       0x01
+wTotalLength:                    0x0072  -> Validated
+bEndpointAddress:                  0x81  -> Direction: IN - EndpointID: 1
+bmInfo:                            0x00  -> Dynamic Format Change not Supported
+bTerminalLink:                     0x02
+bStillCaptureMethod:               0x00  -> No Still Capture
+bTriggerSupport:                   0x00  -> No Hardware Triggering Support
+bTriggerUsage:                     0x00
+bControlSize:                      0x01
+Video Payload Format 1             0x00 
+     D00 = 0   no -  Key Frame Rate
+     D01 = 0   no -  P Frame Rate
+     D02 = 0   no -  Compression Quality
+     D03 = 0   no -  Compression Window Size
+     D04 = 0   no -  Generate Key Frame
+     D05 = 0   no -  Update Frame Segment
+     D06 = 0   no -  Reserved
+     D07 = 0   no -  Reserved
+
+          ===>Video Streaming H.264 Format Type Descriptor<===
+bLength:                           0x34 = 52
+bDescriptorType:                   0x24 
+bDescriptorSubtype:                0x13 
+bFormatIndex:                      0x00 = 0
+bNumFrameDescriptors:              0x01 = 1
+bDefaultFrameIndex:                0x00 = 0
+bMaxCodecConfigDelay:              0x01 = 1 frames
+bmSupportedSliceModes : 0x00 
+     D00 = 0   no -  Maximum number of Macroblocks per slice mode
+     D01 = 0   no -  Target compressed size per slice mode
+     D02 = 0   no -  Number of slices per frame mode
+     D03 = 0   no -  Number of Macroblock rows per slice mode
+     D04 = 0   no -  Reserved
+     D05 = 0   no -  Reserved
+     D06 = 0   no -  Reserved
+     D07 = 0   no -  Reserved
+bmSupportedSyncFrameTypes : 0x00 
+     D00 = 0   no -  Reset
+     D01 = 0   no -  IDR frame with SPS and PPS
+     D02 = 0   no -  IDR frame (with SPS and PPS) that is a long-term reference frame
+     D03 = 0   no -  Non-IDR random-access I frame (with SPS and PPS)
+     D04 = 0   no -  Non-IDR random-access I frame (with SPS and PPS) that is a long-term reference frame
+     D05 = 0   no -  P frame that is a long-term reference frame
+     D06 = 0   no -  Gradual Decoder Refresh frames
+     D07 = 0   no -  Reserved
+bResolutionScaling:         0x00 = 0, Not Supported
+bSimulcastSupport:                 0x00 = 0, one stream
+bmSupportedRateControlModes : 0x00 
+     D00 = 0   no -  Variable Bit Rate (VBR) with underflow allowed (H.264 low_delay_hrd_flag = 1)
+     D01 = 0   no -  Constant Bit Rate (CBR) (H.264 low_delay_hrd_flag = 0)
+     D02 = 0   no -  Constant QP
+     D03 = 0   no -  Global VBR with underflow allowed (H.264 low_delay_hrd_flag = 1)
+     D04 = 0   no -  VBR without underflow (H.264 low_delay_hrd_flag = 0)
+     D05 = 0   no -  Global VBR without underflow (H.264 low_delay_hrd_flag = 0)
+     D06 = 0   no -  Reserved
+     D07 = 0   no -  Reserved
+wMaxMBperSecOneResolutionNoScalability:                 0x0000 (0 MB/sec)
+wMaxMBperSecTwoResolutionsNoScalability:                0x0000 (0 MB/sec)
+wMaxMBperSecThreeResolutionsNoScalability:              0x0000 (0 MB/sec)
+wMaxMBperSecFourResolutionsNoScalability:               0x0000 (0 MB/sec)
+wMaxMBperSecOneResolutionTemporalScalability:           0x0000 (0 MB/sec)
+wMaxMBperSecTwoResolutionsTemporalScalability:          0x0000 (0 MB/sec)
+wMaxMBperSecThreeResolutionsTemporalScalability:        0x0000 (0 MB/sec)
+wMaxMBperSecFourResolutionsTemporalScalability:         0x0000 (0 MB/sec)
+wMaxMBperSecOneResolutionTemporalQualityScalability:    0x0000 (0 MB/sec)
+wMaxMBperSecTwoResolutionsTemporalQualityScalability:   0x0000 (0 MB/sec)
+wMaxMBperSecThreeResolutionsTemporalQualityScalability: 0x0000 (0 MB/sec)
+wMaxMBperSecFourResolutionsTemporalQualityScalability:  0x0000 (0 MB/sec)
+wMaxMBperSecOneResolutionTemporalSpatialScalability:    0x0000 (0 MB/sec)
+wMaxMBperSecTwoResolutionsTemporalSpatialScalability:   0x0000 (0 MB/sec)
+wMaxMBperSecThreeResolutionsTemporalSpatialScalability: 0x0000 (0 MB/sec)
+wMaxMBperSecFourResolutionsTemporalSpatialScalability:  0x0000 (0 MB/sec)
+wMaxMBperSecOneResolutionFullScalability:               0x0000 (0 MB/sec)
+wMaxMBperSecTwoResolutionsFullScalability:              0x0000 (0 MB/sec)
+wMaxMBperSecThreeResolutionsFullScalability:            0x0000 (0 MB/sec)
+wMaxMBperSecFourResolutionsFullScalability:             0x0000 (0 MB/sec)
+
+          ===>Video Streaming H.264 Frame Type Descriptor<===
+bLength:                           0x30 = 48
+bDescriptorType:                   0x24 
+bDescriptorSubtype:                0x14 
+bFrameIndex:                       0x00 = 0
+wWidth:                          0x0500 = 1280
+wHeight:                         0x02D0 = 720
+wSARwidth:                       0x0001 = 1
+wSARheight:                      0x0001 = 1
+wProfile:                        0x640C - Constrained High Profile
+bLevelIDC:                       0x20 = 32 = Level 3.2 
+wConstrainedToolset:             0x0000 - Reserved
+bmSupportedUsages : 0x03 0x00 0x07 0x00 
+     D00 = 1  yes -  Real-time/UCConfig mode 0
+     D01 = 1  yes -  Real-time/UCConfig mode 1
+     D02 = 0   no -  Real-time/UCConfig mode 2Q
+     D03 = 0   no -  Real-time/UCConfig mode 2S
+     D04 = 0   no -  Real-time/UCConfig mode 3
+     D05 = 0   no -  Reserved
+     D06 = 0   no -  Reserved
+     D07 = 0   no -  Reserved
+     D08 = 0   no -  Broadcast mode 0
+     D09 = 0   no -  Broadcast mode 1
+     D10 = 0   no -  Broadcast mode 2
+     D11 = 0   no -  Broadcast mode 3
+     D12 = 0   no -  Broadcast mode 4
+     D13 = 0   no -  Broadcast mode 5
+     D14 = 0   no -  Broadcast mode 6
+     D15 = 0   no -  Broadcast mode 7
+     D16 = 1  yes -  File Storage mode with I and P slices (e.g. IPPP)
+     D17 = 1  yes -  File Storage mode with I, P, and B slices (e.g. IB...BP)
+     D18 = 1  yes -  File storage all I frame mode
+     D19 = 0   no -  Reserved
+     D20 = 0   no -  Reserved
+     D21 = 0   no -  Reserved
+     D22 = 0   no -  Reserved
+     D23 = 0   no -  Reserved
+     D24 = 0   no -  MVC Stereo High Mode
+     D25 = 0   no -  MVC Multiview Mode
+     D26 = 0   no -  Reserved
+     D27 = 0   no -  Reserved
+     D28 = 0   no -  Reserved
+     D29 = 0   no -  Reserved
+     D30 = 0   no -  Reserved
+     D31 = 0   no -  Reserved
+bmCapabilities : 0x47 0x00 
+     D00 = 1  yes -  CAVLC only
+     D01 = 1  yes -  CABAC only
+     D02 = 1  yes -  Constant frame rate
+     D03 = 0   no -  Separate QP for luma/chroma
+     D04 = 0   no -  Separate QP for Cb/Cr
+     D05 = 0   no -  No picture reordering
+     D06 = 1  yes -  Long-term reference frame
+     D07 = 0   no -  Reserved
+     D08 = 0   no -  Reserved
+     D09 = 0   no -  Reserved
+     D10 = 0   no -  Reserved
+     D11 = 0   no -  Reserved
+     D12 = 0   no -  Reserved
+     D13 = 0   no -  Reserved
+     D14 = 0   no -  Reserved
+     D15 = 0   no -  Reserved
+bmSVCCapabilities : 0x00 0x00 0x00 0x00 
+     D2..D0   = 0  Maximum number of temporal layers = 1
+     D3       = 0  no - Rewrite Support
+     D6..D4   = 0  Maximum number of CGS layers = 1
+     D9..D7   = 0  Number of MGS sublayers
+     D10      = 0  no - Additional SNR scalability support in spatial enhancement layers
+     D13..D11 = 0  Maximum number of spatial layers = 1
+     D14      = 0  no - Reserved 
+     D15      = 0  no - Reserved 
+     D16      = 0  no - Reserved 
+     D17      = 0  no - Reserved 
+     D18      = 0  no - Reserved 
+     D19      = 0  no - Reserved 
+     D20      = 0  no - Reserved 
+     D21      = 0  no - Reserved 
+     D22      = 0  no - Reserved 
+     D23      = 0  no - Reserved 
+     D24      = 0  no - Reserved 
+     D25      = 0  no - Reserved 
+     D26      = 0  no - Reserved 
+     D27      = 0  no - Reserved 
+     D28      = 0  no - Reserved 
+     D29      = 0  no - Reserved 
+     D30      = 0  no - Reserved 
+     D31      = 0  no - Reserved 
+bmMVCCapabilities : 0x00 0x00 0x00 0x00 
+     D2..D0   = 0  Maximum number of temporal layers = 1
+     D10..D3  = 0  Maximum number of view components = 1
+     D11      = 0  no - Reserved 
+     D12      = 0  no - Reserved 
+     D13      = 0  no - Reserved 
+     D14      = 0  no - Reserved 
+     D15      = 0  no - Reserved 
+     D16      = 0  no - Reserved 
+     D17      = 0  no - Reserved 
+     D18      = 0  no - Reserved 
+     D19      = 0  no - Reserved 
+     D20      = 0  no - Reserved 
+     D21      = 0  no - Reserved 
+     D22      = 0  no - Reserved 
+     D23      = 0  no - Reserved 
+     D24      = 0  no - Reserved 
+     D25      = 0  no - Reserved 
+     D26      = 0  no - Reserved 
+     D27      = 0  no - Reserved 
+     D28      = 0  no - Reserved 
+     D29      = 0  no - Reserved 
+     D30      = 0  no - Reserved 
+     D31      = 0  no - Reserved 
+dwMinBitRate:                    0x00000008  = 8 bps
+dwMaxBitRate:                    0x0061A800  = 6,400,000 bps
+dwDefaultFrameInterval:          0x00051615  = 33.333300 mSec (30.00 Hz) 
+bNumFrameIntervals:              0x01 = 1
+dwFrameInterval[0]: 0x00051615 = 33.333300 mSec (30.00 Hz)
+
+          ===>Interface Descriptor<===
+bLength:                           0x09
+bDescriptorType:                   0x04
+bInterfaceNumber:                  0x02
+bAlternateSetting:                 0x00
+bNumEndpoints:                     0x00
+bInterfaceClass:                   0xFF  -> Interface Class Unknown to USBView
+bInterfaceSubClass:                0x00
+bInterfaceProtocol:                0x00
+iInterface:                        0x00
+
+          ===>Additional Error Checking<===
+PASS: number of H.264 frame descriptors (1) == number of frame descriptors (1) specified in H.264 format descriptor(s)
