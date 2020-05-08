@@ -45,6 +45,7 @@ quitLoop:
         consoleUpdate(NULL);
     }
 
+	ClearState();
 	UsbCommsExit();
     consoleExit(NULL);
     return 0;

@@ -14,7 +14,6 @@ static UsbDsInterface *UsbDsVideo, *UsbDsCtrl;
 #define STREAM_INTERFACE		1
 #define WORKAROUND_INTERFACE	2
 
-#define INTERFACE_CTRL_ID		0
 #define INPUT_TERMINAL_ID		1
 #define OUTPUT_TERMINAL_ID		2
 
@@ -72,7 +71,8 @@ static const struct uvc_streaming_control ControlSettings =
 	.bMaxVersion = 0,
 };
 
-static void ClearState()
+//Todo: make a proper exist function
+void ClearState()
 {
 #define clearVal(x) memset(&x, 0, sizeof(x))
 	clearVal(ControlInterface);
@@ -289,30 +289,224 @@ Result UsbVideoInitialize(UsbInterface* VideoStream)
 	UsbDsCtrl = UsbCommsGetInterface(CONTROL_INTERFACE);
 	UsbDsVideo = UsbCommsGetInterface(STREAM_INTERFACE);
 
+	rc = usbDsInterface_GetSetupEvent(UsbDsCtrl, &ControlSetupEvent);
+	rc = usbDsInterface_GetSetupEvent(UsbDsVideo, &VideoSetupEvent);
+
 	return rc;
 }
 
-#define R_FAILED_LOG_RETURN(x, act) do { if (R_FAILED(x)) { LOG("%x @ %u", x, __LINE__); act; return rc; } } while (0)
+#define R_FAILED_RETURN(x) do { if (R_FAILED(x)) { LOG("%x @ %u", x, __LINE__); return rc; } } while (0)
+#define R_FAILED_RETURN_ACT(x, a) do { if (R_FAILED(x)) { LOG("%x @ %u", x, __LINE__); a; return rc; } } while (0)
 
-u8 alignas(0x1000) ControlBuffer[0x1000];
+struct libusb_control_setup {
+	u8  bmRequestType;
+	u8  bRequest;
+	u16 wValue;
+	u16 wIndex;
+	u16 wLength;
+};
+
+enum usb_control_type {
+	USB_CTRLTYPE_TYPE_STANDARD = 0X00,
+	USB_CTRLTYPE_TYPE_CLASS = 0X20,
+	USB_CTRLTYPE_TYPE_VENDOR = 0X40,
+	USB_CTRLTYPE_TYPE_RESERVED = 0X60,
+	USB_CTRLTYPE_TYPE_MASK = 0X60
+};
+
+enum usb_control_recipient {
+	USB_CTRLTYPE_REC_DEVICE = 0X00,
+	USB_CTRLTYPE_REC_INTERFACE = 0X01,
+	USB_CTRLTYPE_REC_ENDPOINT = 0X02,
+	USB_CTRLTYPE_REC_OTHER = 0X03,
+	USB_CTRLTYPE_REC_MASK = 0X1F
+};
+
+static u8 alignas(0x1000) usbbuf[64];
+static Result ep0CtrlSend(const void* s, u32 len)
+{
+	memset(usbbuf, 0, sizeof(usbbuf));
+	memcpy(usbbuf, s, len);
+
+	//this seems to fail with 0x25c8c and after this usbds seems to break completely until console reboot
+	u32 id;
+	Result rc = usbDsInterface_CtrlInPostBufferAsync(UsbDsCtrl, &usbbuf, sizeof(usbbuf), &id);
+	R_FAILED_RETURN(rc);
+	LOG("urbid : %x", id);
+
+	rc = eventWait(&UsbDsCtrl->CtrlInCompletionEvent, 5e+9);
+	R_FAILED_RETURN(rc);
+
+	UsbDsReportData data;
+	rc = usbDsInterface_GetCtrlInReportData(UsbDsCtrl, &data);
+	R_FAILED_RETURN(rc);
+
+	LOG("%d report entries:", data.report_count);
+	for (int i = 0; i < data.report_count; i++)
+	{
+		UsbDsReportEntry e = data.report[i];
+		LOG("id %x, requestedSize %x, transferredSize %x, urb_status %x", e.id, e.requestedSize, e.transferredSize, e.urb_status);
+	}
+
+	return rc;
+}
+
+static Result ep0ReceiveData() 
+{	
+	u32 id;
+	Result rc = usbDsInterface_CtrlOutPostBufferAsync(UsbDsCtrl, usbbuf, sizeof(usbbuf), &id);
+	R_FAILED_RETURN(rc);
+	LOG("urbid : %x", id);
+
+	rc = eventWait(&UsbDsCtrl->CtrlOutCompletionEvent, 5e+9);
+	R_FAILED_RETURN(rc);
+
+	UsbDsReportData data;
+	rc = usbDsInterface_GetCtrlOutReportData(UsbDsCtrl, &data);
+	R_FAILED_RETURN(rc);
+
+	UsbDsReportEntry* correct;
+
+	LOG("%d report entries:", data.report_count);
+	for (int i = 0; i < data.report_count; i++)
+	{
+		UsbDsReportEntry e = data.report[i];
+		LOG("id %x, requestedSize %x, transferredSize %x, urb_status %x", e.id, e.requestedSize, e.transferredSize, e.urb_status);
+		if (e.id == id) correct = &e;
+	}
+
+	u32 sz = sizeof(usbbuf);
+	if (correct && correct->transferredSize > 0 && correct->transferredSize <= sz) sz = correct->transferredSize;
+
+	LOGs("data:");
+	for (u32 i = 0; i < sz; i++)
+		printf("%.2x ", usbbuf[i]);
+	
+	LOGs(":");
+
+	return rc;
+}
+
+static void uvc_handle_video_streaming_req(const struct libusb_control_setup* req)
+{
+	LOG("  uvc_handle_video_streaming_req %x, %x\n", req->wValue, req->bRequest);
+
+	switch (req->wValue >> 8) {
+	case UVC_VS_PROBE_CONTROL:
+		switch (req->bRequest) {
+		case UVC_GET_INFO:
+			break;
+		case UVC_GET_LEN:
+			break;
+		case UVC_GET_MIN:
+		case UVC_GET_MAX:
+		case UVC_GET_DEF:
+			LOG("Probe GET_DEF, bFormatIndex: %d, bmFramingInfo: %x\n",
+				ControlSettings.bFormatIndex,
+				ControlSettings.bmFramingInfo);
+			ep0CtrlSend(&ControlSettings, sizeof(ControlSettings));
+			break;
+		case UVC_GET_CUR:
+			LOG("Probe GET_CUR, bFormatIndex: %d, bmFramingInfo: %x\n",
+				ControlSettings.bFormatIndex,
+				ControlSettings.bmFramingInfo);
+			ep0CtrlSend(&ControlSettings, sizeof(ControlSettings));
+			break;
+		case UVC_SET_CUR:
+			ep0ReceiveData(req);
+			break;
+		}
+		break;
+	case UVC_VS_COMMIT_CONTROL:
+		switch (req->bRequest) {
+		case UVC_GET_INFO:
+			break;
+		case UVC_GET_LEN:
+			break;
+		case UVC_GET_CUR:
+			ep0CtrlSend(&ControlSettings, sizeof(ControlSettings));
+			break;
+		case UVC_SET_CUR:
+			ep0ReceiveData(req);
+			break;
+		}
+		break;
+	}
+}
+
+struct libusb_control_setup /*alignas(0x1000)*/ setupPacket;
+static Result InternalUsbVideoHandleSetupPackets(UsbDsInterface* iface)
+{
+	memset(&setupPacket, 0xAA, sizeof(setupPacket));
+	Result rc;
+
+	rc = eventWait(&UsbDsCtrl->CtrlOutCompletionEvent, 2e+9);
+	R_FAILED_RETURN(rc);
+
+	//Result rc = eventWait(&VideoSetupEvent, 5E+9); //This never seems to fire
+	//if (rc)
+	//{
+	//	printf("eventwait result : %x\n", rc);
+	//}
+
+	rc = usbDsInterface_GetSetupPacket(UsbDsCtrl, &setupPacket, sizeof(setupPacket));
+	R_FAILED_RETURN(rc);
+
+	printf("got setup: ");
+	for (int i = 0; i < sizeof(setupPacket); i++)
+		printf("%.2x ", ((u8*)&setupPacket)[i]);
+	printf("\n");
+
+	switch (setupPacket.bmRequestType) {
+	case USB_ENDPOINT_IN | USB_CTRLTYPE_TYPE_CLASS | USB_CTRLTYPE_REC_INTERFACE: // 0xA1
+	case USB_ENDPOINT_OUT | USB_CTRLTYPE_TYPE_CLASS | USB_CTRLTYPE_REC_INTERFACE: // 0x21
+		switch (setupPacket.wIndex & 0xFF) {
+		case CONTROL_INTERFACE:
+			switch (setupPacket.wIndex >> 8) {
+			case CONTROL_INTERFACE:
+				LOGs("uvc_handle_interface_ctrl_req");
+				break;
+			case INPUT_TERMINAL_ID:
+				LOGs("uvc_handle_input_terminal_req");
+				break;
+			case OUTPUT_TERMINAL_ID:
+				LOGs("uvc_handle_output_terminal_req");
+				break;
+			}
+			break;
+		case STREAM_INTERFACE:
+			uvc_handle_video_streaming_req(&setupPacket);
+			break;
+		}
+		break;
+	case USB_ENDPOINT_OUT | USB_CTRLTYPE_TYPE_STANDARD | USB_CTRLTYPE_REC_INTERFACE: // 0x01
+		switch (setupPacket.bRequest) {
+		case USB_REQUEST_SET_INTERFACE:
+			LOGs("uvc_handle_set_interface");
+			break;
+		}
+		break;
+	case USB_ENDPOINT_OUT | USB_CTRLTYPE_TYPE_STANDARD | USB_CTRLTYPE_REC_ENDPOINT: // 0x02
+		switch (setupPacket.bRequest) {
+		case USB_REQUEST_CLEAR_FEATURE:
+			LOGs("uvc_handle_clear_feature");
+			break;
+		}
+		break;
+	case USB_ENDPOINT_IN | USB_CTRLTYPE_TYPE_STANDARD | USB_CTRLTYPE_REC_DEVICE: // 0x80
+		switch (setupPacket.wValue >> 8) {
+		case 0x0A: /* USB_DT_DEBUG */
+			break;
+		}
+	default:
+		LOG("Unknown bmRequestType: 0x%02X\n", setupPacket.bmRequestType);
+	}
+
+	LOGs("Done");
+	return 0;
+}
+
 Result UsbVideoHandleSetupPackets()
 {
-	u32 id;
-	Event evt;
-
-	Result rc = usbDsInterface_GetCtrlOutCompletionEvent(UsbDsCtrl, &evt);
-	R_FAILED_LOG_RETURN(rc, (void)0);
-	
-	rc = usbDsInterface_CtrlOutPostBufferAsync(UsbDsCtrl, ControlBuffer, sizeof(ControlBuffer), &id);
-	R_FAILED_LOG_RETURN(rc, eventClose(&evt));
-	
-	rc = eventWait(&evt, 5E+9);
-	R_FAILED_LOG_RETURN(rc, eventClose(&evt));
-
-	for (int i = 0; i < 0x100; i++)
-		printf("%.2x ", ControlBuffer[i]);
-
-	LOGs("\nDone");
-	eventClose(&evt);
-	return 0;
+	return InternalUsbVideoHandleSetupPackets(UsbDsCtrl);
 }

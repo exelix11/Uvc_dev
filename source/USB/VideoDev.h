@@ -3,3 +3,5 @@
 
 Result UsbVideoInitialize(UsbInterface* VideoStream);
 Result UsbVideoHandleSetupPackets();
+
+void ClearState();
