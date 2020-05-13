@@ -39,8 +39,7 @@
   <ItemGroup>
     <ClCompile Include="source\main.c" />
     <ClCompile Include="source\USB\UsbComms.c" />
-    <ClCompile Include="source\USB\usbDsExten.c" />
-    <ClCompile Include="source\USB\VideoDev.c" />
+    <ClCompile Include="source\USB\Serial.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.nx.hint" />
@@ -50,9 +49,7 @@
     <ClInclude Include="source\modes\defines.h" />
     <ClInclude Include="source\modes\modes.h" />
     <ClInclude Include="source\USB\UsbComms.h" />
-    <ClInclude Include="source\USB\usbDsExten.h" />
-    <ClInclude Include="source\USB\uvc.h" />
-    <ClInclude Include="source\USB\VideoDev.h" />
+    <ClInclude Include="source\USB\Serial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

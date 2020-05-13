@@ -6,13 +6,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.c" />
-    <ClCompile Include="source\USB\usbDsExten.c">
-      <Filter>USB</Filter>
-    </ClCompile>
-    <ClCompile Include="source\USB\VideoDev.c">
-      <Filter>USB</Filter>
-    </ClCompile>
     <ClCompile Include="source\USB\UsbComms.c">
+      <Filter>USB</Filter>
+    </ClCompile>
+    <ClCompile Include="source\USB\Serial.c">
       <Filter>USB</Filter>
     </ClCompile>
   </ItemGroup>
@@ -28,20 +25,14 @@
     <ClInclude Include="source\USB\UsbComms.h">
       <Filter>USB</Filter>
     </ClInclude>
-    <ClInclude Include="source\USB\usbDsExten.h">
-      <Filter>USB</Filter>
-    </ClInclude>
-    <ClInclude Include="source\USB\uvc.h">
-      <Filter>USB</Filter>
-    </ClInclude>
-    <ClInclude Include="source\USB\VideoDev.h">
-      <Filter>USB</Filter>
-    </ClInclude>
     <ClInclude Include="source\modes\modes.h">
       <Filter>modes</Filter>
     </ClInclude>
     <ClInclude Include="source\modes\defines.h">
       <Filter>modes</Filter>
+    </ClInclude>
+    <ClInclude Include="source\USB\Serial.h">
+      <Filter>USB</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

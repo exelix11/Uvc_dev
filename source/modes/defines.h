@@ -34,5 +34,5 @@ Debugging socket crash:
 #define TYPE_MODE_ERROR 999999
 
 #include <stdio.h>
-#define LOG(x, ...) do {printf(x "\n", __VA_ARGS__);  consoleUpdate(NULL);} while(0)
-#define LOGs(x) do {printf(x "\n");  consoleUpdate(NULL);} while(0)
+#define LOG(x, ...) do {printf(x "\n", __VA_ARGS__);  } while(0)
+#define LOGs(x) do {printf(x "\n");  } while(0)
