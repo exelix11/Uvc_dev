@@ -1,5 +1,5 @@
 # Uvc_dev
-## WHat is this ?
+## What is this ?
 This is a standalone homebrew containing test code for the [UVC branch of SysDVR](https://github.com/exelix11/SysDVR/tree/UVC). \
 It was meant to implement a usb video class device via software for streaming gampeplay with SysDVR. I'm not interested on working on this animore and it's here only for referece.
 
